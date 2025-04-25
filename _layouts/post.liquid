@@ -1,0 +1,84 @@
+---
+layout: base
+---
+
+<div class="container mt-4">
+  <div class="post-header">
+    <h1 class="post-title">{{ title }}</h1>
+    <div class="post-meta">
+      <span class="post-date"><i class="bi bi-calendar3"></i> {{ date | readableDate }}</span>
+      {% if tags.size > 0 %}
+      <div class="post-tags">
+        {% for tag in tags %}
+          {% if tag != "posts" %}
+          <a href="/tags/{{ tag }}/" class="badge rounded-pill post-tag">{{ tag | capitalize }}</a>
+          {% endif %}
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if image %}
+  <div class="post-featured-image">
+    <img src="{{ image }}" alt="{{ title }}" class="img-fluid rounded">
+    {% if imageCredit %}
+    <div class="image-credit">Photo: {{ imageCredit }}</div>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  <div class="post-content">
+    {{ content }}
+  </div>
+
+  <div class="post-navigation">
+    <div class="row">
+      {% if collections.posts %}
+        {% assign previousPost = collections.posts | getPreviousCollectionItem: page %}
+        {% assign nextPost = collections.posts | getNextCollectionItem: page %}
+
+        <div class="col-md-6">
+          {% if previousPost %}
+          <a href="{{ previousPost.url }}" class="post-nav-link prev">
+            <i class="bi bi-arrow-left"></i>
+            <span class="nav-title">{{ previousPost.data.title }}</span>
+          </a>
+          {% endif %}
+        </div>
+
+        <div class="col-md-6 text-end">
+          {% if nextPost %}
+          <a href="{{ nextPost.url }}" class="post-nav-link next">
+            <span class="nav-title">{{ nextPost.data.title }}</span>
+            <i class="bi bi-arrow-right"></i>
+          </a>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="related-posts mt-5">
+    <h3>You might also like</h3>
+    <div class="row">
+      {% assign relatedPosts = collections.posts | head: 3 %}
+      {% for post in relatedPosts %}
+      <div class="col-md-4 mb-4">
+        <div class="card animal-card h-100">
+          {% if post.data.image %}
+          <div class="card-img-container">
+            <img src="{{ post.data.image }}" class="card-img-top" alt="{{ post.data.title }}">
+          </div>
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ post.data.title }}</h5>
+            <p class="card-text">{{ post.data.excerpt | truncate: 100 }}</p>
+            <a href="{{ post.url }}" class="btn btn-primary btn-sm">Read More</a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>

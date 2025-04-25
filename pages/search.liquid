@@ -1,0 +1,135 @@
+---
+layout: base
+title: Search Results
+permalink: /search/
+---
+
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col">
+      <h1 class="page-title">Search <span class="highlight">Results</span></h1>
+      <div id="search-results-info" class="search-result-count"></div>
+    </div>
+  </div>
+
+  <div class="row" id="search-results-container">
+    <!-- Results will be inserted here via JavaScript -->
+  </div>
+
+  <div id="no-results" style="display: none;">
+    <div class="alert alert-info">
+      <h2>No animals found</h2>
+      <p>Sorry, we couldn't find any animals matching your search. Try different keywords or browse our <a href="/blog/">animal blog</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+    
+    if (!query) {
+      window.location.href = '/';
+      return;
+    }
+    
+    document.title = `Search: ${query} | Rebecca's Animal Blog`;
+    
+    // This is a simple client-side search - in a real implementation, 
+    // you would have a more sophisticated search mechanism
+    const searchResults = [];
+    let allPosts = [];
+    
+    // In a real implementation, you'd fetch this from an API or a pre-generated JSON file
+    // For this demo, we're using a small hardcoded set of posts
+    allPosts = [
+      {
+        title: 'Amazing Elephants',
+        url: '/blog/amazing-elephants/',
+        excerpt: 'Elephants are the largest land animals on Earth, known for their long trunks and incredible memory.',
+        image: 'https://images.pexels.com/photos/133394/pexels-photo-133394.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+        tags: ['mammals', 'endangered']
+      },
+      {
+        title: 'All About Penguins',
+        url: '/blog/all-about-penguins/',
+        excerpt: 'Penguins are flightless birds that live almost exclusively in the Southern Hemisphere.',
+        image: 'https://images.pexels.com/photos/689784/pexels-photo-689784.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+        tags: ['birds', 'sea-creatures']
+      },
+      {
+        title: 'Fascinating Tigers',
+        url: '/blog/fascinating-tigers/',
+        excerpt: 'Tigers are the largest cat species, known for their powerful build and distinctive orange coat with black stripes.',
+        image: 'https://images.pexels.com/photos/145939/pexels-photo-145939.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
+        tags: ['mammals', 'endangered', 'predators']
+      }
+    ];
+    
+    // Perform search
+    if (query && query.length >= 2) {
+      const lowerQuery = query.toLowerCase();
+      
+      allPosts.forEach(post => {
+        // Check title, content, and tags for matches
+        if (
+          post.title.toLowerCase().includes(lowerQuery) || 
+          post.excerpt.toLowerCase().includes(lowerQuery) ||
+          post.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+        ) {
+          searchResults.push(post);
+        }
+      });
+    }
+    
+    // Display results
+    const resultsContainer = document.getElementById('search-results-container');
+    const resultsInfo = document.getElementById('search-results-info');
+    const noResultsElement = document.getElementById('no-results');
+    
+    if (searchResults.length > 0) {
+      resultsInfo.textContent = `Found ${searchResults.length} result${searchResults.length === 1 ? '' : 's'} for "${query}"`;
+      
+      // Clear container and add results
+      resultsContainer.innerHTML = '';
+      
+      searchResults.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.className = 'col-md-6 col-lg-4 mb-4';
+        
+        postElement.innerHTML = `
+          <div class="card animal-card h-100">
+            ${post.image ? `
+              <div class="card-img-container">
+                <img src="${post.image}" class="card-img-top" alt="${post.title}">
+              </div>
+            ` : ''}
+            <div class="card-body">
+              <h3 class="card-title h5">${post.title}</h3>
+              <p class="card-text">${post.excerpt}</p>
+              <div class="d-flex justify-content-between align-items-center">
+                <a href="${post.url}" class="btn btn-primary">Read More</a>
+                ${post.tags && post.tags.length > 0 ? `
+                  <div>
+                    ${post.tags.map(tag => `
+                      <a href="/tags/${tag}/" class="badge animal-tag">${tag.charAt(0).toUpperCase() + tag.slice(1)}</a>
+                    `).join('')}
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        resultsContainer.appendChild(postElement);
+      });
+      
+      noResultsElement.style.display = 'none';
+    } else {
+      resultsInfo.textContent = `No results found for "${query}"`;
+      resultsContainer.innerHTML = '';
+      noResultsElement.style.display = 'block';
+    }
+  });
+</script>
